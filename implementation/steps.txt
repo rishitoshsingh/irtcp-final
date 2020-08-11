@@ -1,0 +1,59 @@
+Install and configure a cluster of zookeeper, kafka and spark
+
+
+Step 1:
+    Start zookeeper daemon Command :
+        $ zkServer.sh start
+    Start kafka daemon Command :
+        $ $kStart $kConfig
+        
+    Command jps is to show active daemons 
+    
+    
+Step 2:
+    For training Command :
+    $ spark-submit train_model.py
+    (Training is already done, so I will skip this step).
+    
+    
+Step 3: 
+    Create kafka topic "twitterstream".
+    Kafka Producer will insert tweets in this topic
+    Kafka Consumer will read tweets from this topic
+    This is one time step, thus I will be skipping this too
+    Command :
+    $ kafka-topics.sh --create --zookeeper localhost:2181 --partitions 1 --topic twitterstream --replication-factor 1
+
+    To list the topics :
+    $ kafka-topics.sh --list --zookeeper localhost:2181
+
+    
+Step 4:
+    Start streaming of tweets, i.e create a kafka producer to insert documents in kafka topic "twitterstream"
+    You will see live filtered tweets in terminal
+    but first i will change python version to 3.7.6
+    Command :
+    $ python kafka_file/stream_data.py
+    
+    
+    
+Step 5:
+    To see documents in Kafka topic:
+    Command :
+    $ kafka-console-consumer.sh --zookeeper localhost:2181 --topic twitterstream --from-beginning
+    
+    
+    
+Step 6:
+    Live Processing: A Spark consumer will read from Kafka topic and classify tweets (using trained classifier in previous step) and insert in hosted mongodb database.
+    Command :
+    $ spark-submit --packages org.apache.spark:spark-streaming-kafka-0-8_2.11:2.1.0 live_processing.py
+
+    
+Step 7:
+    Start webserver
+    Command : 
+    $ sudo systemctl start lampp
+    goto : localhost/irtcp to open website.
+    
+Step 8: Now IRTCP application
